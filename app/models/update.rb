@@ -4,20 +4,21 @@ class Update < ActiveRecord::Base
   schema_associations
   has_many :notifications, dependent: :destroy
   validates_presence_of :user_id, :project_id, :comment, :comment_html
+  before_save -> {self.comment = comment.gsub(/^\s+/, "")}
 
   catarse_auto_html_for field: :comment, video_width: 560, video_height: 340
 
   def email_comment_html
     auto_html(comment) do
-      html_escape :map => {
+      html_escape map: {
         '&' => '&amp;',
         '>' => '&gt;',
         '<' => '&lt;',
         '"' => '"'
       }
       email_image width: 513
-      redcloth :target => :_blank
-      link :target => :_blank
+      redcloth target: :_blank
+      link target: :_blank
     end
   end
 

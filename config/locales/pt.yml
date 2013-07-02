@@ -1,6 +1,5 @@
 pt:
   current_update: 'Alteração atual feita em '
-  backs_to_confirm: "%{count} apoios em prazo de confirmação."
   'no': "Não"
   'yes': "Sim"
   or: "ou"
@@ -141,7 +140,9 @@ pt:
         address_state: Estado
         address_street: Logradouro
         address_zip_code: CEP
-        cpf: 'CPF / CNPJ'
+        cpf: 'CPF / CNPJ '
+        cpf_hint_title: 'Nota Fiscal será emitida para esse documento'
+        cpf_hint: '(?)'
         state_inscription: 'Inscrição Estadual'
         current_password: "Senha atual"
         email: Email
@@ -162,6 +163,7 @@ pt:
     reward_must_be_from_project: "deve ser do mesmo projeto"
     should_not_back_if_maximum_backers_been_reached: "já atingiu seu número máximo de apoiadores"
     value_must_be_at_least_rewards_value: "deve ser pelo menos %{minimum_value} para a recompensa selecionada"
+    project_should_be_online: "Você não pode apoiar um projeto que não está no ar"
   project_plural: projetos
   backer_plural: apoiadores
   backer_singular: apoiador
@@ -172,13 +174,20 @@ pt:
   comment:
     display_time: "Há %{time_ago}"
   credits:
+    modal:
+      title: 'Quer mesmo solicitar o reembolso do seu apoio?'
+      text: "Saiba como funciona o processo de reembolso no Catarse:"
+      link: "Regras e Funcionamento dos reembolsos / estornos"
+      reject_btn: "Não, desejo manter meus créditos"
+      accept_btn: "Sim, desejo solicitar o reembolso do meu apoio"
     index:
       back_date: "Data do apoio"
       current_credits_html: "Seu saldo atual é de <span id=\"current_credits\">%{credits}</span> em créditos."
-      important_html: "Seria bem bacana que se você quiser seu reembolso, você solicite-o em até 60 dias após finalizado o projeto. Para saber todas as regras de funcionamento de reembolso, <a href='http://suporte.catarse.me/knowledgebase/articles/164746-regras-e-funcionamento-dos-reembolsos-estornos' target='_blank'>clique aqui</a>. Qualquer dúvida, acesse nosso <a href='http://suporte.catarse.me' target='_blank'>suporte</a>."
+      important_html: "Para saber todas as regras de funcionamento de reembolso, <a href='http://suporte.catarse.me/knowledgebase/articles/164746-regras-e-funcionamento-dos-reembolsos-estornos' target='_blank'>clique aqui</a>. Qualquer dúvida, acesse nosso <a href='http://suporte.catarse.me' target='_blank'>suporte</a>."
       project: Projeto
       refund_expration_date: "Prazo para estorno"
-      refunded: "Pedido enviado com sucesso"
+      refunded: "Reembolso requisitado com sucesso. Nossa equipe entrará em contato com você em até 2 dias úteis. "
+      insufficient_credits: "Você não tem créditos suficientes para realizar este estorno."
       refunds_title: "Apoios que podem ter estorno realizado"
       request_refund: "Solicitar estorno"
       requested_refund: "Solicitado estorno"
@@ -196,6 +205,17 @@ pt:
     request_refund_from:
       subject: "Estorno do apoio ao projeto %{name}"
       subject_html: "Usuário %{name} pediu extorno referente ao apoio %{backer_key} para o projeto %{backer_project} no valor de %{backer_value} efetuado pelo serviço %{backer_payment_service}."
+      user_name: 'Usúario'
+      user_email: 'E-mail do usuário'
+      payer_email: 'E-mail usado no meio de pagamento'
+      payer_name: 'Nome usado no meio de pagamento'
+      project: 'Projeto'
+      backer_key: 'Chave do apoio'
+      payment_id: 'ID do meio de pagamento'
+      backer_value: 'Valor do apoio'
+      payment_method: 'Meio de pagamento'
+      payment_choice: 'Forma de pagamento'
+      created_at: 'Iniciado em'
   curated_pages:
     index:
       title: "Páginas curadas"
@@ -264,8 +284,8 @@ pt:
   found_plural: Encontrados
   found_singular: Encontrado
   here: aqui
-  i_backed: "Eu apoiei o projeto %{name} no @Catarse_"
-  i_just_backed: "Eu acabei de apoiar o projeto %{name} no @Catarse_"
+  i_backed: "Eu apoiei o projeto %{name} no @catarse"
+  i_just_backed: "Eu acabei de apoiar o projeto %{name} no @catarse"
   layouts:
     login:
       login_with_facebook: "entre com sua conta do facebook"
@@ -315,7 +335,7 @@ pt:
         facebook_text: "Uhuu! O projeto '%{name}', que eu apoiei, foi bem-sucedido no Catarse!"
         notification_text: "Uhuu! O projeto %{link} que você apoiou foi bem-sucedido! Espalhe por aí!"
         reward_notification_text: "Em breve, %{link} irá entrar em contato com você para entregar sua recompensa. Desfrute!"
-        twitter_text: "Uhuu! O projeto '%{name}', que eu apoiei, foi bem-sucedido no @Catarse_! %{short_url}"
+        twitter_text: "Uhuu! O projeto '%{name}', que eu apoiei, foi bem-sucedido no @catarse! %{short_url}"
       unsuccessful:
         email_subject: "O projeto %{project_name} não foi financiado - algumas informações úteis"
         email_text: 'Infelizmente o projeto %{project_link}, que você apoiou, não atingiu a meta estabelecda e não foi financiado no Catarse.<br><br>Em função disto, você recebeu <strong>%{value}</strong> em créditos para apoiar outros projetos. Você pode conhecer mais projetos de %{project_category} %{explore_category_link}.<br><br>Caso prefira, você pode pedir o reembolso do seu dinheiro %{credits_link}. Lembre que o seu cadastro no site foi feito através do <b>%{user_provider}.</b> É por ele que você deve entrar para acessar sua conta. Caso você tenha alguma dificuldade nesse processo, envie um email para financeiro@catarse.me com o assunto "Reembolso - problema no login".<br><br>Caso você prefira solicitar o reembolso, só para lembrar, como constam nos %{link_to_term} do Catarse, que se o apoio foi feito com cartão de crédito, o valor será estornado na próxima fatura do cartão. Se o apoio foi feito através de transferência bancária ou boleto, enviaremos um email com os procedimentos necessários para poder devolver o valor para você.<br><br>Se, por qualquer motivos, quiser entrar em contato com %{project_owner_name}, realizador do projeto, mande um email para %{project_owner_email}.<br><br>Se tiver alguma outra dúvida, acesse nosso FAQ ou mande um email para o financeiro@catarse.me.<br>'
@@ -357,6 +377,7 @@ pt:
         header_subtitle: "Sem você talvez este projeto não tivesse uma chance. Bem-vindo ao time!"
         header_title: "Muito obrigado! :D"
         text_subtitle: "Conte para todo mundo o que você acabou de fazer"
+        recommended_projects: "Você também poderá curtir esses projetos:"
         text_title_html: "Você agora é parte do grupo que faz de tudo para o %{link} acontecer."
         title: "Muito obrigado"
       checkout:
@@ -475,6 +496,9 @@ pt:
       destroy_confirmation: "Deseja remover esta novidade?"
     rewards:
       reward_title: "Para %{minimum} ou mais"
+      backs_to_confirm:
+        one: "1 apoio em prazo de confirmação."
+        other: "%{count} apoios em prazo de confirmação."
       title: "Apoie e ganhe..."
     send_mail:
       success: "Seu projeto foi enviado com sucesso! Logo entraremos em contato. Muito obrigado!"
@@ -557,7 +581,7 @@ pt:
       title: "Agooora sim! Envie seu projeto, campeão."
       legend_html: "Após preencher o formulário abaixo, você receberá uma página de projeto em rascunho. Lá você irá adicionar as recompensas e poderá compartilhar com seus amigos para ter um projeto ainda mais afiado.<br><br>As informações preenchidas abaixo não são definitivas, mas lembre-se de que quanto mais consistente estiver o seu projeto nesse envio, mais rápido ele irá para o ar.<br><br><b>Importante</b> <i> O Catarse é uma plataforma curada, o que significa que vamos avaliar o foco, a viabilidade, e a consistência do seu projeto durante o processo de Rascunho. Se entendermos que o seu projeto não está de acordo com os nossos <a href='https://docs.google.com/document/d/1Heh9LlvoSoD0lUfbmV5WlISJ3nqmGpEQiw15TBuCn-0/edit' target='_blank' >Critérios de Seleção</a>, ele poderá ser recusado pela equipe de curadores.</i>"
     twitter:
-      take_a_look: "Confira o projeto %{name} no @Catarse_"
+      take_a_look: "Confira o projeto %{name} no @catarse"
     video_embed:
       a_project_by_html: "Um projeto de %{link} no"
   projects_mailer:

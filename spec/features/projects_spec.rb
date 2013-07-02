@@ -8,7 +8,7 @@ describe "Projects" do
   before {
     #NOTE: Weird bug on edit project test
     RoutingFilter.active = true
-    ProjectsController.any_instance.stubs(:last_tweets).returns([])
+    ProjectsController.any_instance.stub(:last_tweets).and_return([])
   }
   before {
     ::Configuration[:base_url] = 'http://catarse.me'
@@ -20,7 +20,7 @@ describe "Projects" do
     before do
       FactoryGirl.create(:project, state: 'online', online_days: 30, online_date: Time.now)
       FactoryGirl.create(:project, state: 'online', online_days: -30)
-      visit root_path(:locale => :pt)
+      visit root_path(locale: :pt)
     end
 
     it "should show recent projects" do
@@ -33,7 +33,7 @@ describe "Projects" do
     before do
       FactoryGirl.create(:project, name: 'Foo', state: 'online', online_days: 30, recommended: true)
       FactoryGirl.create(:project, name: 'Lorem', state: 'online', online_days: 30, recommended: false)
-      visit explore_path(:locale => :pt)
+      visit explore_path(locale: :pt)
       sleep 3
     end
     it "should show recommended projects" do
@@ -59,7 +59,7 @@ describe "Projects" do
   describe "new and create" do
     before do
       login
-      visit new_project_path(:locale => :pt)
+      visit new_project_path(locale: :pt)
     end
 
     it "should present the form and save the data" do
@@ -71,7 +71,7 @@ describe "Projects" do
       ].each do |a|
         fill_in "project_#{a}", with: project.attributes[a]
       end
-      check 'accept'
+      check 'project_accepted_terms'
       find('#project_submit').click
       #Project.first.name.should == project.name
     end
@@ -82,7 +82,7 @@ describe "Projects" do
 
     before do
       login
-      visit project_path(project, :locale => :pt)
+      visit project_path(project, locale: :pt)
     end
 
     it 'edit tab should be present' do

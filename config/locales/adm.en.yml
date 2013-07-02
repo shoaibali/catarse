@@ -1,10 +1,12 @@
 en:
   adm: &admin
+    confirm_dialog: 'You are sure?'
     projects:
       index:
         by_state: 'By state'
         between_created_at: 'Created at between'
         submit: 'Filter'
+        send_to_trash: 'Delete'
         send_to_draft: 'Send to DRAFT!'
         reject: 'Reject!'
         approve: 'Approve!'
@@ -22,7 +24,7 @@ en:
         menu: Backers
         credits: Credits
         credits_view: "Calculated credits"
-        id: Id
+        id: ID
         key: Key
         submit: Search
         has_credits_difference: "Discrepancy in credits"
@@ -36,14 +38,32 @@ en:
         value: Value
         provider: Provider
     backers:
+      messages:
+        successful:
+          confirm: 'Backer confirmed!'
+          pendent: 'Backer unconfirmed!'
+          refund: 'Backer refunded!'
+          change_reward: 'Reward changed!'
+          hide: 'Backer hidden!'
+          cancel: 'Backer canceled!'
       index:
+        cancel: 'Cancel backer'
+        refund_and_hide: 'Refund and hide'
+        backer_info: 'Info of backer %{key}'
+        payment_id: 'Payment ID'
+        payment_method: 'Payment method'
+        payment_fee: 'Payment method fee'
+        payment_choice: 'Payment choice'
+        payer_email: 'Payer email'
+        user_email: 'Catarse user email'
         pending_to_refund: 'Pending to refund'
+        created_at: 'Created at'
         title: "Backers management"
         menu: Backs
         anonymous: Anonymous?
         confirmed: Confirmed?
         credits: "Used credits?"
-        id: Id
+        id: ID
         key: Key
         no_backers: "No backers found."
         project: Project
@@ -58,6 +78,28 @@ en:
         total_users: Users
         user: User
         value: Value
+    statistics:
+      index:
+        menu: "Statistics"
+        title: "Statistics"
+        total_users: "Users"
+        total_backs: "Backs"
+        total_backers: "Backers"
+        total_backed: "Backed"
+        total_projects: "Projects"
+        total_projects_success: "Successful"
+        total_projects_online: "Online"
+      projects_by_week:
+        title: "Projects sent per week"
+        current_period: "Last 8 weeks"
+        previous_period: "Previous 8 weeks"
+        last_year: "Last year"
+      backers_by_week:
+        title: "Backed value confirmed per week"
+        current_period: "Last 8 weeks"
+        previous_period: "Previous 8 weeks"
+        last_year: "Last year"
+
   channels:
     adm:
       <<: *admin

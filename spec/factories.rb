@@ -30,17 +30,18 @@ FactoryGirl.define do
   factory :project do |f|
     f.name "Foo bar"
     f.permalink { generate(:permalink) }
-    f.association :user, :factory => :user
-    f.association :category, :factory => :category
+    f.association :user, factory: :user
+    f.association :category, factory: :category
     f.about "Foo bar"
     f.headline "Foo bar"
     f.goal 10000
+    f.online_date Time.now
     f.online_days 5
     f.how_know 'Lorem ipsum'
     f.more_links 'Ipsum dolor'
     f.first_backers 'Foo bar'
-    f.expires_at { 1.month.from_now }
     f.video_url 'http://vimeo.com/17298435'
+    f.state 'online'
   end
 
   factory :notification_type do |f|
@@ -48,34 +49,35 @@ FactoryGirl.define do
   end
 
   factory :unsubscribe do |f|
-    f.association :user, :factory => :user
-    f.association :project, :factory => :project
-    f.association :notification_type, :factory => :notification_type
+    f.association :user, factory: :user
+    f.association :project, factory: :project
+    f.association :notification_type, factory: :notification_type
   end
 
   factory :notification do |f|
-    f.association :user, :factory => :user
-    f.association :backer, :factory => :backer
-    f.association :project, :factory => :project
-    f.association :notification_type, :factory => :notification_type
+    f.association :user, factory: :user
+    f.association :backer, factory: :backer
+    f.association :project, factory: :project
+    f.association :notification_type, factory: :notification_type
   end
 
   factory :reward do |f|
-    f.association :project, :factory => :project
-    f.minimum_value 1.00
+    f.association :project, factory: :project
+    f.minimum_value 10.00
     f.description "Foo bar"
   end
 
   factory :backer do |f|
-    f.association :project, :factory => :project
-    f.association :user, :factory => :user
-    f.confirmed true
+    f.association :project, factory: :project
+    f.association :user, factory: :user
     f.confirmed_at Time.now
     f.value 10.00
+    f.state 'confirmed'
+    f.credits false
   end
 
   factory :payment_notification do |f|
-    f.association :backer, :factory => :backer
+    f.association :backer, factory: :backer
     f.extra_data {}
   end
 
@@ -106,8 +108,8 @@ FactoryGirl.define do
   end
 
   factory :update do |f|
-    f.association :project, :factory => :project
-    f.association :user, :factory => :user
+    f.association :project, factory: :project
+    f.association :user, factory: :user
     f.title "My title"
     f.comment "This is a comment"
     f.comment_html "<p>This is a comment</p>"
@@ -118,6 +120,6 @@ FactoryGirl.define do
     description "Lorem Ipsum"
     sequence(:permalink) { |n| "#{n}-test-page" }
   end
-  
+
 end
 

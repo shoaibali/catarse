@@ -3,15 +3,14 @@ en:
     title: "The biggest crowdfunding community in Brazil"
     meta_title:  "%{title} · %{company_name}"
     description: "O Catarse é uma ferramenta diferente – e colaborativa – para tirar o seu projeto do papel!"
-    keywords: "catarse, crowdfunding, projecto, community, open source"
-  backs_to_confirm: "%{count} backers in time to confirm."
+    keywords: "catarse, crowdfunding, project, community, open source"
   backer_report_to_project_owner:
     reward_description: 'Reward description'
     confirmed_at: 'Payment confirmed at'
     value: 'Back value'
     service_fee: 'Catarse fee'
     user_name: 'Backer name'
-    user_email: 'User catarse profile e-mail'
+    user_email: 'Catarse user profile e-mail'
     payer_email: 'Payment gateway user e-mail'
     payment_method: 'Payment method'
     address_street: 'Street'
@@ -44,9 +43,9 @@ en:
       subtitle: "total of %{total}"
   project_by: "project by"
   tell_about_this_back: "Tell the world about your support!"
-  share_my_backs: "See the projects that i support in Catarse!"
+  share_my_backs: "See the projects that I support in Catarse!"
   tell_about_this_project: "Tell the world about your project!"
-  share_my_projects: "See my created projects in Catarse!"
+  share_my_projects: "See my projects in Catarse!"
   count_backed_projects: "backed %{total} projects"
   footer:
     titles:
@@ -110,14 +109,14 @@ en:
         category: Category
         expires_at: Deadline
         online_days: Days of the air campaign
-        headline: "Punch Line"
+        headline: Headline
         image_url: "Image URL"
         name: Name
-        user_id: "User Id"
+        user_id: "User ID"
         video_url: "Video URL"
-        permalink: 'type you project URL'
-        how_know: "How did you meet Catarse?"
-        more_linkt: 'Where can we find more about you and your project?'
+        permalink: 'Project URL'
+        how_know: "How did you hear about Catarse?"
+        more_links: 'Where can we find more about you and your project?'
       reward:
         description: Description
         maximum_backers: "Maximum backers"
@@ -130,7 +129,9 @@ en:
         address_state: State
         address_street: Street
         address_zip_code: "Zip code"
-        cpf: 'CPF / CNPJ'
+        cpf: 'CPF / CNPJ '
+        cpf_hint_title: 'Nota Fiscal será emitida para esse documento'
+        cpf_hint: '(?)'
         state_inscription: 'State Inscription'
         moip_login: 'MoIP Login'
         moip_login_hint: '(How to create an account)'
@@ -152,6 +153,7 @@ en:
     reward_must_be_from_project: "must be from the same project"
     should_not_back_if_maximum_backers_been_reached: "has reached its maximum backers"
     value_must_be_at_least_rewards_value: "must be at least %{minimum_value} for the selected reward"
+    project_should_be_online: "You cannot back a project that is not online"
   backer_plural: backers
   project_plural: projects
   project_singular: project
@@ -162,13 +164,20 @@ en:
   comment:
     display_time: "%{time_ago} ago"
   credits:
+    modal:
+      title: "Do you want to confirm your refund request?"
+      text: "Check out how our refund process works:"
+      link: "See how the refund works"
+      reject_btn: "I want to keep my credits"
+      accept_btn: "I want to request the refund"
     index:
       back_date: "Back date"
       current_credits_html: "Your current balance is <span id=\"current_credits\">%{credits}</span> in credits."
-      important_html: "You have <strong>up to 60 days after the payment date</strong> to ask for a refund. If you ask for a refund, the value of your payment will be deducted from your credits."
+      important_html: "If you ask for a refund, the value of your payment will be deducted from your credits."
       project: Project
       refund_expration_date: "Refund deadline"
-      refunded: Refunded
+      refunded: "Refund request successfully done. Our team will contact you within two business days."
+      insufficient_credits: "You don't have enough credits to request this refund."
       refunds_title: "Payments that can be refunded"
       request_refund: "Request refund"
       requested_refund: "Requested refund"
@@ -186,6 +195,17 @@ en:
     request_refund_from:
       subject: "Refund request from project %{name}"
       subject_html: "User %{name} requested refund for the back %{backer_key} to the project %{backer_project} in the amount of %{backer_value} made by %{backer_payment_service} gateway."
+      user_name: 'User name'
+      user_email: 'User email'
+      payer_email: 'Payment email'
+      payer_name: 'User name used on payment'
+      project: 'Project'
+      backer_key: 'Backer key'
+      payment_id: 'Payment ID'
+      backer_value: 'Backer value'
+      payment_method: 'Payment method'
+      payment_choice: 'Payment choice'
+      created_at: 'created at'
   curated_pages:
     index:
       title: "Curated pages"
@@ -317,8 +337,8 @@ en:
   found_plural: Found
   found_singular: Found
   here: here
-  i_backed: "I backed the project %{name} on @Catarse_"
-  i_just_backed: "I just backed the project %{name} on @Catarse_"
+  i_backed: "I backed the project %{name} on @catarse"
+  i_just_backed: "I just backed the project %{name} on @catarse"
   layouts:
     login:
       login_with_facebook: "sign in with your facebook account"
@@ -367,7 +387,7 @@ en:
         facebook_text: "Hooray! The project '%{name}', which I backed, was successful on Catarse!"
         notification_text: "Hooray! The project %{link} that you backed was successful! Spread the word!"
         reward_notification_text: "Soon, %{link} will contact you to deliver your reward. Enjoy!"
-        twitter_text: "Hooray! The project '%{name}', which I backed, was successful on @Catarse_! %{short_url}"
+        twitter_text: "Hooray! The project '%{name}', which I backed, was successful on @catarse! %{short_url}"
       unsuccessful:
         email_subject: "The project %{project_name} wasn't funded on Catarse."
         email_text: 'Unfortunately the project %{project_link}, that you have backed, did not reached its goal and was not funded at Catarse.<br><br>So, you have received <strong>%{value}</strong> in credits to back other projects. You can meet others %{project_category} projects in %{explore_category_link}.<br><br>You also can ask for your refund by clicking in %{credits_link}. Remember that you signed up in Catarse using %{user_provider}. If you have some difficulty in this process, do not be shame to send an email to financeiro@catarse.me with the subject "Refund - login issue".<br><br>If, for any reason, you want to contact %{project_owner_name}, send an email to %{project_owner_email}.<br><br>If you have any other doubt, acess our FAQ or send an email to <a href="mail_to:contato@catarse.me" style="color: #008800;">contato@catarse.me</a>.<br>'
@@ -407,6 +427,7 @@ en:
         header_subtitle: "Without you maybe this project wouldn't stand a chance. Welcome to the team!"
         header_title: "Thank you! :D"
         text_subtitle: "Tell everyone what you just did"
+        recommended_projects: "You may like these other projects:"
         text_title_html: "You are now part of the group that does everything to make %{link} happen."
         title: "Thank you"
       checkout:
@@ -517,6 +538,9 @@ en:
       destroy_confirmation: "Do you want to remove the update?"
     rewards:
       reward_title: "For %{minimum} or more"
+      backs_to_confirm:
+        one:  "1 backer in time to confirm."
+        other: "%{count} backers in time to confirm."
       title: "Back and receive..."
     send_mail:
       success: "Your project was successfully sent! We'll soon contact you. Thanks a lot!"
@@ -588,7 +612,7 @@ en:
       subtitle: "The time to make it happen is now! We really want to know what you're up to..."
       title: "Submit your project"
     twitter:
-      take_a_look: "Check out the project %{name} on @Catarse_"
+      take_a_look: "Check out the project %{name} on @catarse"
     video_embed:
       a_project_by_html: "A project by %{link} on"
   projects_mailer:

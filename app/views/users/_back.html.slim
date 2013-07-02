@@ -16,7 +16,7 @@ script type="text/template" id="user_back_template"
         = image_tag "successful.#{I18n.locale}.png"
         |<% } else if(project['waiting_funds']) { %>
         = image_tag "waiting_confirmation.#{I18n.locale}.png"
-        |<% } else { %>
+        |<% } else if(project['failed']) { %>
         = image_tag "not_successful.#{I18n.locale}.png"
         |<% } %>
     | <% } %>
@@ -65,6 +65,6 @@ script type="text/template" id="user_back_template"
       .tell_about
         p= t('tell_about_this_back')
         ul
-          li= link_to image_tag('catarse/facebook_black_icon.png'), "http://www.facebook.com/sharer.php?u=<%= encodeURIComponent(project['full_uri']) %>&t=#{t('share_my_backs')}<%= encodeURIComponent(project['name']) %>".html_safe, :target => '_blank'
-          li= link_to image_tag('catarse/twitter_black_icon.png'), "http://twitter.com/share?text=#{t('share_my_backs')}<%= encodeURIComponent(project['name']) %>&url=<%= encodeURIComponent(project['full_uri']) %>".html_safe, :target => '_blank'
+          li= link_to image_tag('catarse/facebook_black_icon.png'), "http://www.facebook.com/sharer.php?u=<%= encodeURIComponent(project['full_uri']) %>&t=#{t('share_my_backs')}<%= encodeURIComponent(project['name']) %>".html_safe, target: '_blank'
+          li= link_to image_tag('catarse/twitter_black_icon.png'), "http://twitter.com/share?text=#{t('share_my_backs')}<%= encodeURIComponent(project['name']) %>&url=<%= encodeURIComponent(project['full_uri']) %>".html_safe, target: '_blank'
   .clearfix

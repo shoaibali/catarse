@@ -5,6 +5,7 @@ require 'spec_helper'
 describe PaymentEngines do
   let(:engine){ {name: 'test', review_path: ->(backer){ "/#{backer}" }, locale: 'en'} }
   let(:engine_pt){ {name: 'test pt', review_path: ->(backer){ "/#{backer}" }, locale: 'pt'} }
+  let(:backer){ FactoryGirl.create(:backer) }
   before{ PaymentEngines.clear }
 
   describe ".register" do
@@ -20,6 +21,21 @@ describe PaymentEngines do
     end
     subject{ PaymentEngines.engines }
     it{ should be_empty }
+  end
+
+  describe ".configuration" do
+    subject{ PaymentEngines.configuration }
+    it{ should == ::Configuration }
+  end
+
+  describe ".create_payment_notification" do
+    subject{ PaymentEngines.create_payment_notification({ backer_id: backer.id, extra_data: { test: true } }) }
+    it{ should == PaymentNotification.where(backer_id: backer.id).first }
+  end
+
+  describe ".find_payment" do
+    subject{ PaymentEngines.find_payment({ id: backer.id }) }
+    it{ should == backer }
   end
 
   describe ".engines" do

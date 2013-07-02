@@ -32,34 +32,32 @@ describe Reward do
   end
 
   it "should have a minimum value" do
-    r = FactoryGirl.build(:reward, :minimum_value => nil)
+    r = FactoryGirl.build(:reward, minimum_value: nil)
     r.should_not be_valid
   end
 
   it "should have a display_minimum" do
     r = FactoryGirl.build(:reward)
-    r.minimum_value = 1
-    r.display_minimum.should == "R$ 1,00"
     r.minimum_value = 10
     r.display_minimum.should == "R$ 10,00"
     r.minimum_value = 99
     r.display_minimum.should == "R$ 99,00"
   end
 
-  it "should have a greater than 1.00 minimum value" do
+  it "should have a greater than 10.00 minimum value" do
     r = FactoryGirl.build(:reward)
     r.minimum_value = -0.01
     r.should_not be_valid
-    r.minimum_value = 0.99
+    r.minimum_value = 9.99
     r.should_not be_valid
-    r.minimum_value = 1.00
+    r.minimum_value = 10.00
     r.should be_valid
-    r.minimum_value = 1.01
+    r.minimum_value = 10.01
     r.should be_valid
   end
 
   it "should have a description" do
-    r = FactoryGirl.build(:reward, :description => nil)
+    r = FactoryGirl.build(:reward, description: nil)
     r.should_not be_valid
   end
 
@@ -94,8 +92,8 @@ describe Reward do
 
       context 'and have confirmed backers and backers in time to confirm' do
         before do
-           FactoryGirl.create(:backer, confirmed: true, reward: reward, project: reward.project)
-           FactoryGirl.create(:backer, confirmed: false, payment_token: 'ABC', reward: reward, project: reward.project)
+           FactoryGirl.create(:backer, state: 'confirmed', reward: reward, project: reward.project)
+           FactoryGirl.create(:backer, state: 'waiting_confirmation', reward: reward, project: reward.project)
         end
 
         it { should be_false }
@@ -104,8 +102,8 @@ describe Reward do
 
       context 'and have confirmed backers and the in time to confirm already expired' do
         before do
-           FactoryGirl.create(:backer, confirmed: true, reward: reward, project: reward.project)
-           FactoryGirl.create(:backer, confirmed: false, payment_token: 'ABC', reward: reward, project: reward.project, created_at: 8.days.ago)
+           FactoryGirl.create(:backer, state: 'confirmed', reward: reward, project: reward.project)
+           FactoryGirl.create(:backer, state: 'pending', payment_token: 'ABC', reward: reward, project: reward.project, created_at: 8.days.ago)
         end
 
         it { should be_false }
@@ -114,7 +112,7 @@ describe Reward do
 
       context 'and reached the maximum backers number with confirmed backers' do
         before do
-           3.times { FactoryGirl.create(:backer, confirmed: true, reward: reward, project: reward.project) }
+           3.times { FactoryGirl.create(:backer, state: 'confirmed', reward: reward, project: reward.project) }
         end
 
         it { should be_true }
@@ -123,7 +121,7 @@ describe Reward do
 
       context 'and reached the maximum backers number with backers in time to confirm' do
         before do
-           3.times { FactoryGirl.create(:backer, confirmed: false, payment_token: 'ABC', reward: reward, project: reward.project) }
+           3.times { FactoryGirl.create(:backer, state: 'waiting_confirmation', reward: reward, project: reward.project) }
         end
 
         it { should be_true }
@@ -134,13 +132,13 @@ describe Reward do
 
   it "should have a HTML-safe name that is a HTML composition from minimum_value, description and sold_out" do
     I18n.locale = :pt
-    r = FactoryGirl.build(:reward, :minimum_value => 0, :description => "Description", :maximum_backers => 0)
+    r = FactoryGirl.build(:reward, minimum_value: 0, description: "Description", maximum_backers: 0)
     r.name.should == "<div class='reward_minimum_value'>Não quero recompensa</div><div class='reward_description'>Description</div><div class=\"sold_out\">Esgotada</div><div class='clear'></div>"
     r.maximum_backers = 1
     r.name.should == "<div class='reward_minimum_value'>Não quero recompensa</div><div class='reward_description'>Description</div><div class='clear'></div>"
-    r.minimum_value = 1
-    r.name.should == "<div class='reward_minimum_value'>R$ 1,00+</div><div class='reward_description'>Description</div><div class='clear'></div>"
+    r.minimum_value = 10
+    r.name.should == "<div class='reward_minimum_value'>R$ 10,00+</div><div class='reward_description'>Description</div><div class='clear'></div>"
     r.description = "Description<javascript>XSS()</javascript>"
-    r.name.should == "<div class='reward_minimum_value'>R$ 1,00+</div><div class='reward_description'>Description&lt;javascript&gt;XSS()&lt;/javascript&gt;</div><div class='clear'></div>"
+    r.name.should == "<div class='reward_minimum_value'>R$ 10,00+</div><div class='reward_description'>Description&lt;javascript&gt;XSS()&lt;/javascript&gt;</div><div class='clear'></div>"
   end
 end

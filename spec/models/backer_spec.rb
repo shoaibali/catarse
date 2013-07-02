@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 describe Backer do
-  let(:user){ FactoryGirl.create(:user) }
-  let(:project){ FactoryGirl.create(:project, state: 'failed') }
-  let(:unfinished_project){ FactoryGirl.create(:project, state: 'online') }
-  let(:successful_project){ FactoryGirl.create(:project, state: 'successful') }
-  let(:unfinished_project_backer){ FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => true, :user => user, :project => unfinished_project) }
-  let(:sucessful_project_backer){ FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => true, :user => user, :project => successful_project) }
-  let(:not_confirmed_backer){ FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => false, :user => user, :project => unfinished_project) }
-  let(:older_than_180_days_backer){ FactoryGirl.create(:backer, :created_at => (Date.today - 181.days),:value => 10, :credits => false, :requested_refund => false, :confirmed => true, :user => user, :project => unfinished_project) }
-  let(:valid_refund){ FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => true, :user => user, :project => project) }
+  let(:user){ create(:user) }
+  let(:failed_project){ create(:project, state: 'online') }
+  let(:unfinished_project){ create(:project, state: 'online') }
+  let(:successful_project){ create(:project, state: 'online') }
+  let(:unfinished_project_backer){ create(:backer, state: 'confirmed', user: user, project: unfinished_project) }
+  let(:sucessful_project_backer){ create(:backer, state: 'confirmed', user: user, project: successful_project) }
+  let(:not_confirmed_backer){ create(:backer, user: user, project: unfinished_project) }
+  let(:valid_refund){ create(:backer, state: 'confirmed', user: user, project: failed_project) }
+
 
   describe "Associations" do
     it { should have_many(:payment_notifications) }
@@ -25,143 +25,261 @@ describe Backer do
     it{ should_not allow_value(9.99).for(:value) }
     it{ should allow_value(10).for(:value) }
     it{ should allow_value(20).for(:value) }
+  end
 
-    it "should have reward from the same project only" do
-      backer = FactoryGirl.build(:backer)
-      project1 = FactoryGirl.create(:project)
-      project2 = FactoryGirl.create(:project)
-      backer.project = project1
-      reward = FactoryGirl.create(:reward, :project => project2)
-      backer.should be_valid
-      backer.reward = reward
-      backer.should_not be_valid
+  describe ".between_values" do
+    let(:start_at) { 10 }
+    let(:ends_at) { 20 }
+    subject { Backer.between_values(start_at, ends_at) }
+    before do
+      create(:backer, value: 10)
+      create(:backer, value: 15)
+      create(:backer, value: 20)
+      create(:backer, value: 21)
+    end
+    it { should have(3).itens }
+  end
+
+  describe ".by_state" do
+    before do
+      2.times { create(:backer, state: 'confirmed') }
+      create(:backer, state: 'waiting_confirmation')
+      create(:backer, state: 'canceled')
     end
 
-    it "should have a value at least equal to reward's minimum value" do
-      project = FactoryGirl.create(:project)
-      reward = FactoryGirl.create(:reward, :minimum_value => 500, :project => project)
-      backer = FactoryGirl.build(:backer, :reward => reward, :project => project)
-      backer.value = 499.99
-      backer.should_not be_valid
-      backer.value = 500.00
-      backer.should be_valid
-      backer.value = 500.01
-      backer.should be_valid
+    it "should return all confirmed backers" do
+      Backer.by_state('confirmed').should have(2).itens
     end
 
-    it "should not be able to back if reward's maximum backers' been reached (and maximum backers > 0)" do
-      project = FactoryGirl.create(:project)
-      reward1 = FactoryGirl.create(:reward, :maximum_backers => nil, :project => project)
-      reward2 = FactoryGirl.create(:reward, :maximum_backers => 1, :project => project)
-      reward3 = FactoryGirl.create(:reward, :maximum_backers => 2, :project => project)
-      backer = FactoryGirl.build(:backer, :reward => reward1, :project => project)
-      backer.should be_valid
-      backer.save
-      backer = FactoryGirl.build(:backer, :reward => reward1, :project => project)
-      backer.should be_valid
-      backer.save
-      backer = FactoryGirl.build(:backer, :reward => reward2, :project => project)
-      backer.should be_valid
-      backer.save
-      backer = FactoryGirl.build(:backer, :reward => reward2, :project => project)
-      backer.should_not be_valid
-      backer = FactoryGirl.build(:backer, :reward => reward3, :project => project)
-      backer.should be_valid
-      backer.save
-      backer = FactoryGirl.build(:backer, :reward => reward3, :project => project)
-      backer.should be_valid
-      backer.save
-      backer = FactoryGirl.build(:backer, :reward => reward3, :project => project)
-      backer.should_not be_valid
+    it "should return all waiting confirmation backers" do
+      Backer.by_state('waiting_confirmation').should have(1).itens
+    end
+
+    it "should return all canceled backers" do
+      Backer.by_state('canceled').should have(1).itens
     end
   end
-  
-  describe "#refund!" do
-    subject{ FactoryGirl.build(:backer, :value => 99.99, :refunded => false) }
-    it "should set refunded to true" do
-      subject.refund!
-      subject.refunded.should == true
+
+  describe ".can_cancel" do
+    subject { Backer.can_cancel}
+
+    context "when backer is in time to wait the confirmation" do
+      before do
+        create(:backer, state: 'waiting_confirmation', created_at: 3.weekdays_ago)
+      end
+      it { should have(0).item }
     end
-  end  
+
+    context "when backer is by bank transfer and is passed the confirmation time" do
+      before do
+        create(:backer, state: 'waiting_confirmation', payment_choice: 'DebitoBancario', created_at: 2.weekdays_ago)
+        create(:backer, state: 'waiting_confirmation', payment_choice: 'DebitoBancario', created_at: 0.weekdays_ago)
+      end
+      it { should have(1).item }
+    end
+
+    context "when we have backers that is passed the confirmation time" do
+      before do
+        create(:backer, state: 'waiting_confirmation', created_at: 3.weekdays_ago)
+        create(:backer, state: 'waiting_confirmation', created_at: 6.weekdays_ago)
+      end
+      it { should have(1).itens }
+    end
+  end
+
+  describe "#project_should_be_online" do
+    subject{ backer }
+    context "when project is draft" do
+      let(:backer){ build(:backer, project: create(:project, state: 'draft')) }
+      it{ should_not be_valid }
+    end
+    context "when project is waiting_funds" do
+      let(:backer){ build(:backer, project: create(:project, state: 'waiting_funds')) }
+      it{ should_not be_valid }
+    end
+    context "when project is successful" do
+      let(:backer){ build(:backer, project: create(:project, state: 'successful')) }
+      it{ should_not be_valid }
+    end
+    context "when project is online" do
+      let(:backer){ build(:backer, project: unfinished_project) }
+      it{ should be_valid }
+    end
+    context "when project is failed" do
+      let(:backer){ build(:backer, project: create(:project, state: 'failed')) }
+      it{ should_not be_valid }
+    end
+  end
+
+  describe "#should_not_back_if_maximum_backers_been_reached" do
+    let(:reward){ create(:reward, maximum_backers: 1) }
+    let(:backer){ build(:backer, reward: reward, project: reward.project) }
+    subject{ backer }
+    context "when backers count is lower than maximum_backers" do
+      it{ should be_valid }
+    end
+    context "when backers count is equal than maximum_backers" do
+      before{ create(:backer, reward: reward, project: reward.project, state: 'confirmed') }
+      it{ should_not be_valid }
+    end
+  end
+
+  describe "#reward_must_be_from_project" do
+    let(:backer){ build(:backer, reward: reward, project: unfinished_project) }
+    subject{ backer }
+    context "when reward is from the same project" do
+      let(:reward){ create(:reward, project: unfinished_project) }
+      it{ should be_valid }
+    end
+    context "when reward is not from the same project" do
+      let(:reward){ create(:reward) }
+      it{ should_not be_valid }
+    end
+  end
+
+  describe "#value_must_be_at_least_rewards_value" do
+    let(:reward){ create(:reward, minimum_value: 500) }
+    let(:backer){ build(:backer, reward: reward, project: reward.project, value: value) }
+    subject{ backer }
+    context "when value is lower than reward minimum value" do
+      let(:value){ 499.99 }
+      it{ should_not be_valid }
+    end
+    context "when value is equal than reward minimum value" do
+      let(:value){ 500.00 }
+      it{ should be_valid }
+    end
+    context "when value is greater than reward minimum value" do
+      let(:value){ 500.01 }
+      it{ should be_valid }
+    end
+  end
+
+  describe 'state_machine' do
+    let(:backer) { create(:backer, state: initial_state) }
+    let(:initial_state){ 'pending' }
+
+    describe 'initial state' do
+      let(:backer) { Backer.new }
+      it('should be pending') { backer.pending?.should be_true }
+    end
+
+    describe '#pendent' do
+      before { backer.pendent }
+      context 'when in confirmed state' do
+        let(:initial_state){ 'confirmed' }
+        it("should switch to pending state"){ backer.pending?.should be_true}
+      end
+    end
+
+    describe '#confirm' do
+      before { backer.confirm }
+      it("should switch to confirmed state") { backer.confirmed?.should be_true }
+    end
+
+    describe '#waiting' do
+      before { backer.waiting }
+      context "when in peding state" do
+        it("should switch to waiting_confirmation state") { backer.waiting_confirmation?.should be_true }
+      end
+      context 'when in confirmed state' do
+        let(:initial_state){ 'confirmed' }
+        it("should not switch to waiting_confirmation state") { backer.waiting_confirmation?.should be_false }
+      end
+    end
+
+    describe '#cancel' do
+      before { backer.cancel }
+      it("should switch to canceled state") { backer.canceled?.should be_true }
+    end
+
+    describe '#request_refund' do
+      before do
+        BackerObserver.any_instance.stub(:notify_backoffice)
+        backer.request_refund
+      end
+
+      context 'when backer is confirmed' do
+        let(:initial_state){ 'confirmed' }
+        it('should switch to requested_refund state') { backer.requested_refund?.should be_true }
+      end
+
+      context 'when backer is not confirmed' do
+        it('should not switch to requested_refund state') { backer.requested_refund?.should be_false }
+      end
+    end
+
+    describe '#refund' do
+      before do
+        backer.refund
+      end
+
+      context 'when backer is confirmed' do
+        let(:initial_state){ 'confirmed' }
+        it('should switch to refunded state') { backer.refunded?.should be_true }
+      end
+
+      context 'when backer is requested refund' do
+        let(:initial_state){ 'requested_refund' }
+        it('should switch to refunded state') { backer.refunded?.should be_true }
+      end
+
+      context 'when backer is pending' do
+        it('should not switch to refunded state') { backer.refunded?.should be_false }
+      end
+    end
+  end
+
 
   describe '.pending_to_refund' do
     subject { Backer.pending_to_refund }
 
-    context 'when backer is confirmed and as requested refund' do
+    context 'when backer as requested refund' do
       before do
-        FactoryGirl.create(:backer, confirmed: true, requested_refund: true, refunded: true)
-        FactoryGirl.create(:backer, confirmed: true, requested_refund: true, refunded: false)
+        create(:backer, state: 'confirmed')
+        create(:backer, state: 'refunded')
+        create(:backer, state: 'requested_refund')
       end
 
       it { should have(1).item }
-    end
-
-    context 'when backer is confirmed and already have refunded' do
-      before do
-        FactoryGirl.create(:backer, confirmed: true, requested_refund: true, refunded: true)
-        FactoryGirl.create(:backer, confirmed: true, requested_refund: true, refunded: false)
-      end
-
-      it { should have(1).item }
-    end
-
-    context 'when backer is not confirmed' do
-      before do
-        FactoryGirl.create(:backer, confirmed: false, requested_refund: true, refunded: false)
-      end
-
-      it { should have(0).item }
     end
   end
 
   describe '.in_time_to_confirm' do
     subject { Backer.in_time_to_confirm}
-    
-    context 'when we have backers with DebitoBancario and BoletoBancario in time to confirm' do
+
+    context 'when we have backers in waiting confirmation' do
       before do
-        FactoryGirl.create(:backer, confirmed: false, payment_token: 'ABC', payment_choice: 'DebitoBancario', created_at: 1.days.ago)
-        FactoryGirl.create(:backer, confirmed: false, payment_token: 'ABC', payment_choice: 'DebitoBancario', created_at: 2.days.ago)
-        FactoryGirl.create(:backer, confirmed: false, payment_token: 'ABC', payment_choice: 'BoletoBancario', created_at: 3.days.ago)        
+        create(:backer, state: 'waiting_confirmation')
+        create(:backer, state: 'waiting_confirmation')
+        create(:backer, state: 'pending')
       end
-      
-      it { should have(2).item }      
-    end
 
-    context "when backer is just a ghost" do
-      before { FactoryGirl.create(:backer, confirmed: false, payment_token: nil, created_at: 3.days.ago) }
-      it { should have(0).item }
+      it { should have(2).item }
     end
-
   end
 
   describe ".can_refund" do
-    before{ valid_refund }
-
     subject{ Backer.can_refund.all }
-
-    context "when project is successful" do
-      before{ sucessful_project_backer }
-      it{ should == [valid_refund] }
+    before do
+      valid_refund
+      sucessful_project_backer
+      unfinished_project
+      not_confirmed_backer
+      successful_project.update_attributes state: 'successful'
+      failed_project.update_attributes state: 'failed'
     end
-
-    context "when project is not finished" do
-      before{ unfinished_project }
-      it{ should == [valid_refund] }
-    end
-
-    context "when backer is not confirmed" do
-      before{ not_confirmed_backer }
-      it{ should == [valid_refund] }
-    end
-
-    context "when backer is older than 180 days" do
-      before{ older_than_180_days_backer } 
-      it{ should == [valid_refund] }
-    end
+    it{ should == [valid_refund] }
   end
 
   describe "#can_refund?" do
     subject{ backer.can_refund? }
+    before do
+      valid_refund
+      sucessful_project_backer
+      successful_project.update_attributes state: 'successful'
+      failed_project.update_attributes state: 'failed'
+    end
 
     context "when project is successful" do
       let(:backer){ sucessful_project_backer }
@@ -170,11 +288,6 @@ describe Backer do
 
     context "when project is not finished" do
       let(:backer){ unfinished_project_backer }
-      it{ should be_false }
-    end
-
-    context "when backer is older than 180 days" do
-      let(:backer){ older_than_180_days_backer }
       it{ should be_false }
     end
 
@@ -190,85 +303,49 @@ describe Backer do
   end
 
   describe "#credits" do
-    subject{ user.credits }
+    subject{ user.credits.to_f }
     context "when backs are confirmed and not done with credits but project is successful" do
       before do
-        FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => true, :user => user, :project => successful_project)
+        create(:backer, state: 'confirmed', user: user, project: successful_project)
+        successful_project.update_attributes state: 'successful'
       end
       it{ should == 0 }
     end
 
     context "when backs are confirmed and not done with credits" do
       before do
-        FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => true, :user => user, :project => project)
+        create(:backer, state: 'confirmed', user: user, project: failed_project)
+        failed_project.update_attributes state: 'failed'
       end
       it{ should == 10 }
     end
 
     context "when backs are done with credits" do
       before do
-        FactoryGirl.create(:backer, :value => 10, :credits => true, :requested_refund => false, :confirmed => true, :user => user, :project => project)
+        create(:backer, credits: true, state: 'confirmed', user: user, project: failed_project)
+        failed_project.update_attributes state: 'failed'
       end
       it{ should == 0 }
     end
 
     context "when backs are not confirmed" do
       before do
-        FactoryGirl.create(:backer, :value => 10, :credits => false, :requested_refund => false, :confirmed => false, :user => user, :project => project)
+        create(:backer, user: user, project: failed_project, state: 'pending')
+        failed_project.update_attributes state: 'failed'
       end
       it{ should == 0 }
     end
   end
 
-  describe "#confirm!" do
-    subject{ FactoryGirl.build(:backer, :value => 99.99, :confirmed => false) }
-
-    its(:confirmed){ should == false }
-
-    it "should confirm the back" do
-      subject.confirm!
-      subject.confirmed.should == true
-    end
-  end
-
   describe "#display_value" do
     context "when the value has decimal places" do
-      subject{ FactoryGirl.build(:backer, :value => 99.99).display_value }
+      subject{ build(:backer, value: 99.99).display_value }
       it{ should == "R$ 100" }
     end
 
     context "when the value does not have decimal places" do
-      subject{ FactoryGirl.build(:backer, :value => 1).display_value }
+      subject{ build(:backer, value: 1).display_value }
       it{ should == "R$ 1" }
-    end
-  end
-
-  describe "#display_platform_fee" do
-    before(:each) do
-      I18n.locale = :pt
-      @backer = create(:backer, :value => 100)
-    end
-
-    it 'with default tax 7.5%'do
-      @backer.display_platform_fee.should == 'R$ 7,50'
-    end
-
-    it 'with another tax'do
-      @backer.display_platform_fee(5).should == 'R$ 5,00'
-    end
-  end
-
-  describe "#platform_fee" do
-    before(:each) do
-      @backer = create(:backer, :value => 100)
-    end
-
-    it 'with default tax 7.5%'do
-      @backer.platform_fee.should == 7.50
-    end
-
-    it 'with another tax'do
-      @backer.platform_fee(5).should == 5.00
     end
   end
 end

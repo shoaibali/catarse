@@ -1,5 +1,6 @@
 pt:
   adm: &admin
+    confirm_dialog: 'Você tem certeza?'
     financials:
       index:
         id: ID
@@ -29,6 +30,7 @@ pt:
         between_created_at: 'Criados entre'
         id: ID
         name: 'Titulo'
+        send_to_trash: "Deletar"
         send_to_draft: 'Mandar para DRAFT!'
         reject: 'Rejeitar!'
         approve: 'Aprovar!'
@@ -76,13 +78,30 @@ pt:
       messages:
         successful:
           confirm: 'Apoio confirmado com sucesso!'
-          unconfirm: 'Apoio desconfirmado com sucesso!'
+          pendent: 'Apoio desconfirmado com sucesso!'
+          refund: 'Apoio estornado com sucesso!'
           change_reward: 'Recompensa modificada com sucesso!'
+          hide: 'Apoio escondido com sucesso!'
+          cancel: 'Apoio cancelado com sucesso!'
       index:
-        pending_to_refund: 'Extornos pendentes'
+        cancel: 'Cancelar apoio'
+        between_values: 'Valores entre'
+        by_state: 'Estado'
+        refund_and_hide: 'Fazer estorno e não exibir apoio.'
+        backer_info: 'Informações do backer %{key}'
+        payment_id: 'ID do pagamento'
+        payment_method: 'Meio de pagamento'
+        payment_fee: 'Taxa do meio de pagamento'
+        payment_choice: 'Opção de pagamento'
+        payer_email: 'Email utilizado no meio de pagamento'
+        user_email: 'Email utilizado no catarse'
+        created_at: 'Iniciado em'
+        pending_to_refund: 'Estornos pendentes'
         confirm_backer: 'Confirmar apoio'
         unconfirm_backer: 'Desconfirmar apoio'
+        refund_backer: 'Estornar apoio'
         title: "Gerenciamento de apoios"
+        state: 'Estado'
         menu: "Apoios"
         anonymous: Anônimo?
         confirmed: Confirmado?
@@ -102,6 +121,27 @@ pt:
         total_users: usuários
         user: Usuário
         value: Valor
+    statistics:
+      index:
+        menu: "Estatísticas"
+        title: "Estatísticas"
+        total_users: "Usuários"
+        total_backs: "Apoios"
+        total_backers: "Apoiadores"
+        total_backed: "Arrecadação"
+        total_projects: "Projetos"
+        total_projects_success: "Bem sucedidos"
+        total_projects_online: "Online"
+      projects_by_week:
+        title: "Projetos enviados por semana"
+        current_period: "Últimas 8 sem."
+        previous_period: "8 sem. anteriores"
+        last_year: "Ano anterior"
+      backers_by_week:
+        title: "Valor de apoios confirmados por semana"
+        current_period: "Últimas 8 sem."
+        previous_period: "8 sem. anteriores"
+        last_year: "Ano anterior"
   channels:
     adm:
       <<: *admin

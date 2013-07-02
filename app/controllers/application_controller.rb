@@ -1,4 +1,5 @@
 # coding: utf-8
+require 'uservoice_sso'
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
@@ -15,23 +16,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  helper_method :namespace,
-                :fb_admins, :statistics, :render_facebook_sdk, :render_facebook_like,
-                :render_twitter
+  helper_method :namespace, :fb_admins, :render_facebook_sdk, :render_facebook_like, :render_twitter, :display_uservoice_sso
+
   before_filter :set_locale
   before_filter :force_http
 
   # TODO: Change this way to get the opendata
   before_filter do
-    Statistics.new
     @fb_admins = [100000428222603, 547955110]
-  end
-
-  before_filter do
-    if params[:newsletter].present?
-      flash[:notice] = I18n.t('newsletter_ok_body') if params[:newsletter] == 'ok'
-      flash[:alert] = I18n.t('newsletter_error_body') if params[:newsletter] == 'error'
-    end
   end
 
   # We use this method only to make stubing easier 
@@ -48,13 +40,16 @@ class ApplicationController < ActionController::Base
     render_to_string(partial: 'layouts/facebook_like', locals: options).html_safe
   end
 
-  private
-  def statistics
-    @statistics ||= Rails.cache.fetch("global/statiscs", expires_in: 10.minutes) do
-      Statistics.first
+  def display_uservoice_sso
+    if current_user
+      Uservoice::Token.generate({
+        guid: current_user.id, email: current_user.email, display_name: current_user.display_name,
+        url: user_url(current_user), avatar_url: current_user.display_image
+      })
     end
   end
 
+  private
   def fb_admins
     @fb_admins.join(',')
   end
@@ -100,7 +95,7 @@ class ApplicationController < ActionController::Base
   end
 
   def render_404
-    render :file => "#{Rails.root}/public/404.html", :status => 404, :layout => false
+    render file: "#{Rails.root}/public/404.html", status: 404, layout: false
   end
 
   def force_http

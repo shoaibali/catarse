@@ -2,16 +2,16 @@
 require 'spec_helper'
 
 describe ProjectsController do
-  before{ Notification.unstub(:create_notification) }
-  before{ controller.stubs(:current_user).returns(current_user) }
+  before{ Notification.rspec_reset }
+  before{ controller.stub(:current_user).and_return(current_user) }
   before{ ::Configuration[:base_url] = 'http://catarse.me' }
   render_views
   subject{ response }
-  let(:project){ FactoryGirl.create(:project) }
+  let(:project){ create(:project, state: 'draft') }
   let(:current_user){ nil }
 
   describe "POST create" do
-    let(:project){ FactoryGirl.build(:project, expires_at: nil) }
+    let(:project){ build(:project) }
     before do
       post :create, { locale: :pt, project: project.attributes }
     end
@@ -21,7 +21,7 @@ describe ProjectsController do
     end
 
     context "when user is logged in" do
-      let(:current_user){ FactoryGirl.create(:user) }
+      let(:current_user){ create(:user) }
       it{ should redirect_to project_by_slug_path(project.permalink) }
     end
   end
@@ -41,19 +41,19 @@ describe ProjectsController do
     end
 
     context "when user is a registered user" do
-      let(:current_user){ FactoryGirl.create(:user, admin: false) }
+      let(:current_user){ create(:user, admin: false) }
       it { Project.all.include?(project).should be_true }
     end
 
     context "when user is an admin" do
-      let(:current_user){ FactoryGirl.create(:user, admin: true) }
+      let(:current_user){ create(:user, admin: true) }
       it { Project.all.include?(project).should be_false }
     end
   end
 
   describe "GET index" do
     before do
-      controller.stubs(:last_tweets).returns([])
+      controller.stub(:last_tweets).and_return([])
       get :index, locale: :pt
     end
     it { should be_success }
@@ -67,7 +67,7 @@ describe ProjectsController do
     end
 
     context "when user is a registered user" do
-      let(:current_user){ FactoryGirl.create(:user, admin: false) }
+      let(:current_user){ create(:user, admin: false) }
       it { should be_success }
     end
   end
@@ -75,17 +75,17 @@ describe ProjectsController do
   describe "PUT update" do
     shared_examples_for "updatable project" do
       before { put :update, id: project.id, project: { name: 'My Updated Title' },locale: :pt }
-      it { 
+      it {
         project.reload
-        project.name.should == 'My Updated Title' 
+        project.name.should == 'My Updated Title'
       }
     end
 
     shared_examples_for "protected project" do
       before { put :update, id: project.id, project: { name: 'My Updated Title' },locale: :pt }
-      it { 
+      it {
         project.reload
-        project.name.should == 'Foo bar' 
+        project.name.should == 'Foo bar'
       }
     end
 
@@ -101,10 +101,10 @@ describe ProjectsController do
       end
 
       context "when project is online" do
-        let(:project) { FactoryGirl.create(:project, state: 'online') }
+        let(:project) { create(:project, state: 'online') }
 
         before do
-          controller.stubs(:current_user).returns(project.user)
+          controller.stub(:current_user).and_return(project.user)
         end
 
         context "when I try to update the project name and the about field" do
@@ -127,34 +127,34 @@ describe ProjectsController do
     end
 
     context "when user is a registered user" do
-      let(:current_user){ FactoryGirl.create(:user, admin: false) }
+      let(:current_user){ create(:user, admin: false) }
       it_should_behave_like "protected project"
     end
 
     context "when user is an admin" do
-      let(:current_user){ FactoryGirl.create(:user, admin: true) }
+      let(:current_user){ create(:user, admin: true) }
       it_should_behave_like "updatable project"
     end
   end
 
   describe "GET embed" do
     before do
-      get :embed, :id => project, :locale => :pt 
+      get :embed, id: project, locale: :pt
     end
     its(:status){ should == 200 }
   end
 
   describe "GET show" do
     context "when we have update_id in the querystring" do
-      let(:project){ FactoryGirl.create(:project) }
-      let(:update){ FactoryGirl.create(:update, :project => project) }
-      before{ get :show, :permalink => project.permalink, :update_id => update.id, :locale => :pt }
+      let(:project){ create(:project) }
+      let(:update){ create(:update, project: project) }
+      before{ get :show, permalink: project.permalink, update_id: update.id, locale: :pt }
       it("should assign update to @update"){ assigns(:update).should == update }
     end
 
     context "when we have permalink and do not pass permalink in the querystring" do
-      let(:project){ FactoryGirl.create(:project, :permalink => 'test') }
-      before{ get :show, :id => project, :locale => :pt }
+      let(:project){ create(:project, permalink: 'test') }
+      before{ get :show, id: project, locale: :pt }
       it{ should redirect_to project_by_slug_path(project.permalink) }
     end
   end

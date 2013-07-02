@@ -47,7 +47,7 @@ describe RewardsController do
   end
 
   context "When current_user is a guest" do
-    before { controller.stubs(:current_user).returns(nil) }
+    before { controller.stub(:current_user).and_return(nil) }
 
     it_should_behave_like "GET rewards index"
     it_should_behave_like "POST rewards create without permission"
@@ -56,7 +56,7 @@ describe RewardsController do
   end
 
   context "When current_user is a project owner" do
-    before { controller.stubs(:current_user).returns(project.user) }
+    before { controller.stub(:current_user).and_return(project.user) }
 
     it_should_behave_like "GET rewards index"
     it_should_behave_like "POST rewards create"
@@ -64,7 +64,7 @@ describe RewardsController do
     it_should_behave_like "DELETE rewards destroy"
 
     context "When reward already have backers" do
-      before { FactoryGirl.create(:backer, project: project, reward: reward) }
+      before { FactoryGirl.create(:backer, state: 'confirmed', project: project, reward: reward) }
 
       context "can't update the minimum value" do
         before { put :update, project_id: project.id, id: reward.id, reward: { minimum_value: 15, description: 'Amenori ipsum' }, locale: :pt }
@@ -77,7 +77,7 @@ describe RewardsController do
   end
 
   context "when current_user is admin" do
-    before { controller.stubs(:current_user).returns(FactoryGirl.create(:user, admin: true))}
+    before { controller.stub(:current_user).and_return(FactoryGirl.create(:user, admin: true))}
 
     it_should_behave_like "GET rewards index"
     it_should_behave_like "POST rewards create"
@@ -86,7 +86,7 @@ describe RewardsController do
   end
 
   context "When current_user is a registered user" do
-    before { controller.stubs(:current_user).returns(FactoryGirl.create(:user)) }
+    before { controller.stub(:current_user).and_return(FactoryGirl.create(:user)) }
 
     it_should_behave_like "GET rewards index"
     it_should_behave_like "POST rewards create without permission"

@@ -1,9 +1,11 @@
 class ProjectObserver < ActiveRecord::Observer
   observe :project
 
-  def before_save(project)
-    #Notification.create_notification(:project_visible, project.user, project: project) if (project.visible_was == false) && (project.visible == true)
-    project.download_video_thumbnail if project.video_url.present? && project.video_url_changed?
+  def after_validation(project)
+    if project.video_url.present? && project.video_url_changed?
+      project.download_video_thumbnail
+      project.update_video_embed_url
+    end
   end
 
   def after_create(project)
@@ -89,7 +91,6 @@ class ProjectObserver < ActiveRecord::Observer
       {project_id: project.id, user_id: project.user.id},
       project: project) unless project.successful?
 
-    project.update_attributes finished: true, successful: project.successful?
   end
 
   def sync_with_mailchimp(project)
@@ -105,7 +106,6 @@ class ProjectObserver < ActiveRecord::Observer
         CatarseMailchimp::API.subscribe(mailchimp_params, Configuration[:mailchimp_failed_projects_list])
       end
     rescue Exception => e
-      Airbrake.notify({ :error_class => "MailChimp Error", :error_message => "MailChimp Error: #{e.inspect}", :parameters => params}) rescue nil
       Rails.logger.info "-----> #{e.inspect}"
     end
   end
